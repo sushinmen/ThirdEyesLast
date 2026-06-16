@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#08090b" />
+  <meta name="description" content="제3의 눈 — Third Eye. An interactive narrative experience inspired by the manga Homunculus. Web Interaction Design final project." />
+  <title>제3의 눈 · THIRD EYE</title>
+
+  <!-- Fonts: serif (literary) + mono (clinical). Fail gracefully to system fonts offline. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@200;300;400;600;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- Flip no-js -> js as early as possible so CSS can hide pre-animation states only when JS is present -->
+  <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
+</head>
+
+<body>
+  <!-- ===================== ATMOSPHERE OVERLAYS ===================== -->
+  <div class="fx fx--grain" aria-hidden="true"></div>
+  <div class="fx fx--scanlines" aria-hidden="true"></div>
+  <div class="fx fx--vignette" aria-hidden="true"></div>
+  <div class="fx fx--flash" data-flash aria-hidden="true"></div>
+
+  <!-- ===================== CUSTOM CURSOR ===================== -->
+  <div class="cursor" data-cursor aria-hidden="true">
+    <div class="cursor__ring" data-cursor-ring></div>
+    <div class="cursor__dot" data-cursor-dot></div>
+  </div>
+
+  <!-- ===================== SVG SPRITE (reusable eye) ===================== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="irisGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#1a1a1a" />
+        <stop offset="38%" stop-color="#2a0608" />
+        <stop offset="62%" stop-color="#7a1620" />
+        <stop offset="100%" stop-color="#2b0a0d" />
+      </radialGradient>
+      <symbol id="eye" viewBox="0 0 220 120">
+        <path class="eye__lid" d="M6 60 C 60 8, 160 8, 214 60 C 160 112, 60 112, 6 60 Z" />
+        <clipPath id="eyeClip"><path d="M6 60 C 60 8, 160 8, 214 60 C 160 112, 60 112, 6 60 Z" /></clipPath>
+        <g clip-path="url(#eyeClip)">
+          <circle class="eye__iris" cx="110" cy="60" r="42" fill="url(#irisGrad)" />
+          <g class="eye__rays" stroke="#9a2531" stroke-width="1" opacity="0.55">
+            <line x1="110" y1="60" x2="110" y2="20" />
+            <line x1="110" y1="60" x2="150" y2="60" />
+            <line x1="110" y1="60" x2="110" y2="100" />
+            <line x1="110" y1="60" x2="70" y2="60" />
+            <line x1="110" y1="60" x2="138" y2="32" />
+            <line x1="110" y1="60" x2="138" y2="88" />
+            <line x1="110" y1="60" x2="82" y2="88" />
+            <line x1="110" y1="60" x2="82" y2="32" />
+          </g>
+          <circle class="eye__pupil" cx="110" cy="60" r="17" fill="#020202" />
+          <circle class="eye__spec" cx="101" cy="51" r="5" fill="#e8e4dd" opacity="0.85" />
+        </g>
+        <path class="eye__outline" d="M6 60 C 60 8, 160 8, 214 60 C 160 112, 60 112, 6 60 Z" fill="none" />
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ===================== PRELOADER ===================== -->
+  <div class="preloader" data-preloader>
+    <div class="preloader__inner">
+      <div class="drill" data-drill aria-hidden="true">
+        <span class="drill__hole"></span>
+        <span class="drill__ring"></span>
+      </div>
+      <p class="preloader__label mono">트레퍼네이션 진행 중<span data-count>00</span>%</p>
+      <p class="preloader__sub mono">TREPANATION IN PROGRESS</p>
+    </div>
+    <button class="preloader__skip mono" data-skip>건너뛰기 / SKIP</button>
+  </div>
+
+  <!-- ===================== TOP BAR ===================== -->
+  <header class="topbar" data-topbar>
+    <a class="brand" href="." data-cursor-label="처음으로">
+      <span class="brand__eye" aria-hidden="true"><img src="https://media.giphy.com/media/j9d6swYZVM0gi9tp8S/giphy.gif" alt="" onerror="this.style.display='none'" /></span>
+      <span class="brand__text mono">THIRD&nbsp;EYE</span>
+    </a>
+
+    <div class="topbar__right">
+      <div class="depth" title="심층 / DEPTH" aria-hidden="true">
+        <span class="depth__label mono">심층 DEPTH</span>
+        <span class="depth__track"><span class="depth__fill" data-depth-fill></span></span>
+      </div>
+      <button class="sound" data-sound aria-pressed="false" data-cursor-label="소리" title="소리 켜기 / Toggle sound">
+        <span class="sound__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="sound__txt mono">SOUND OFF</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===================== TITLE SCREEN ===================== -->
+  <main class="title" data-title>
+    <div class="title__inner">
+      <p class="title__over mono" data-reveal>WEB&nbsp;INTERACTION&nbsp;EXPERIENCE</p>
+      <h1 class="title__main">
+        <span class="title__ko" data-reveal>제3의 눈</span>
+        <span class="title__en mono" data-reveal>THIRD&nbsp;EYE</span>
+      </h1>
+      <p class="title__tag" data-reveal>
+        당신은 표면 너머를 볼 준비가 되었습니까?
+        <span class="title__tag-en">Are you ready to see beyond the surface?</span>
+      </p>
+      <button class="btn btn--begin" data-begin data-cursor-label="열다" data-reveal>
+        <span class="btn__ko">눈을 뜬다</span>
+        <span class="btn__en mono">BEGIN</span>
+      </button>
+      <p class="title__hint mono" data-reveal>이어폰 · 소리 권장 / HEADPHONES RECOMMENDED</p>
+      <button class="title__notes mono" data-notes-open data-cursor-label="해설" data-reveal>［ 해설 · 이야기의 실제 배경 / THE REAL BEHIND THE STORY ］</button>
+    </div>
+    <div class="title__credit mono" data-reveal>HOMUNCULUS 에서 영감을 받음 · 인터랙티브 픽션</div>
+  </main>
+
+  <!-- ===================== STAGE (scenes render here) ===================== -->
+  <section class="stage" data-stage hidden>
+    <div class="stage__visual" data-visual>
+      <!-- procedural / image visual injected by JS -->
+      <div class="stage__figure" data-figure></div>
+    </div>
+
+    <div class="stage__panel">
+      <p class="stage__speaker mono" data-speaker></p>
+      <div class="stage__text" data-text aria-live="polite"></div>
+      <p class="stage__text-en" data-text-en></p>
+
+      <div class="choices" data-choices role="group" aria-label="선택 / Choices"></div>
+
+      <p class="stage__ending mono" data-ending hidden></p>
+      <div class="stage__endbtns">
+        <button class="btn btn--restart" data-restart hidden data-cursor-label="다시">
+          <span class="btn__ko">처음으로 돌아간다</span>
+          <span class="btn__en mono">RETURN TO THE BEGINNING</span>
+        </button>
+        <button class="btn btn--notes" data-notes-open data-notes-btn hidden data-cursor-label="해설">
+          <span class="btn__ko">해설을 읽는다</span>
+          <span class="btn__en mono">THE REAL — READ THE NOTES</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="stage__back mono" data-back hidden data-cursor-label="이전">↩ 이전 / BACK</button>
+  </section>
+
+  <!-- ===================== 해설 / NOTES (the real background) ===================== -->
+  <section class="notes" data-notes hidden aria-hidden="true">
+    <button class="notes__close mono" data-notes-close data-cursor-label="닫기">✕ 닫기 / CLOSE</button>
+    <div class="notes__scroll">
+      <header class="notes__head">
+        <p class="notes__kicker mono" data-reveal>현실 · THE REAL BEHIND THE STORY</p>
+        <h2 class="notes__title" data-reveal>해설</h2>
+        <p class="notes__lead" data-reveal>이 이야기는 세 가지 실제에서 비롯되었다.<span>This story is built upon three real things.</span></p>
+      </header>
+
+      <!-- ── 01 트레퍼네이션 ─────────────────────────────── -->
+      <article class="note">
+        <figure class="media">
+          <!-- ▼▼ 직접 만든 이미지/영상을 넣으려면 아래 한 줄로 교체하세요 ▼▼
+               To use your own image/video, REPLACE the <div class="media__ph"> below with ONE of:
+                 <img src="assets/trepanation.jpg" alt="trepanation">
+                 <video src="assets/trepanation.mp4" autoplay muted loop playsinline></video>
+          -->
+          <div class="media__ph" data-art="skull" aria-hidden="true"></div>
+          <figcaption class="mono">추천 이미지 · 천공술 삽화 / 두개골 X-ray &nbsp;—&nbsp; suggested: trepanation illustration · skull</figcaption>
+        </figure>
+        <div class="note__body">
+          <span class="note__num mono">01</span>
+          <h3 class="note__h">트레퍼네이션 <span class="mono">TREPANATION</span></h3>
+          <p>트레퍼네이션은 두개골에 구멍을 뚫는, 인류에게 알려진 가장 오래된 외과 수술 중 하나다. 신석기 시대의 두개골에서도 그 흔적이 발견된다. 과거에는 두통·간질·정신 질환을 치료하거나, 머릿속의 ‘악령’을 내보내기 위해 행해졌다. 만화 《호문쿨루스》의 주인공은 바로 이 시술을 받은 뒤부터, 남들이 보지 못하는 것을 보기 시작한다.</p>
+          <p class="en">Trepanation — boring a hole into the skull — is one of the oldest surgical procedures known to humankind, with traces found even in Neolithic skulls. It was once performed to treat headaches, epilepsy and mental illness, or to release the “evil spirits” trapped inside the head. In «Homunculus», the protagonist begins to see what others cannot only after undergoing it.</p>
+        </div>
+      </article>
+
+      <!-- ── 02 호문쿨루스란? ─────────────────────────────── -->
+      <article class="note note--flip">
+        <figure class="media">
+          <!-- 이미지/영상 교체: <img src="assets/homunculus.jpg" alt="homunculus"> 또는 <video ...> -->
+          <div class="media__ph" data-art="homunculus" aria-hidden="true"></div>
+          <figcaption class="mono">추천 이미지 · 대뇌 호문쿨루스 모형 / 연금술 판화 &nbsp;—&nbsp; suggested: cortical homunculus · alchemical print</figcaption>
+        </figure>
+        <div class="note__body">
+          <span class="note__num mono">02</span>
+          <h3 class="note__h">호문쿨루스란? <span class="mono">WHAT IS A HOMUNCULUS</span></h3>
+          <p>‘호문쿨루스(homunculus)’는 라틴어로 ‘작은 인간’을 뜻한다. 16세기 연금술사 파라켈수스는 인공적으로 만들어낸 작은 생명체를 이렇게 불렀다. 한편 뇌과학에는 ‘대뇌 호문쿨루스’가 있다 — 신체 각 부위가 뇌에서 차지하는 비중대로 기괴하게 일그러뜨린 인간의 모형이다. 두 의미 모두 ‘인간의 숨겨진 진짜 형태’라는 이 작품의 주제와 맞닿아 있다.</p>
+          <p class="en">“Homunculus” is Latin for “little human.” The 16th-century alchemist Paracelsus used the word for an artificial miniature being. In neuroscience, the “cortical homunculus” is a grotesquely distorted human figure, each body part scaled to the area of brain devoted to it. Both meanings echo this work’s theme — the hidden, true shape of a person.</p>
+        </div>
+      </article>
+
+      <!-- ── 03 만화 《호문쿨루스》 ─────────────────────────── -->
+      <article class="note">
+        <figure class="media">
+          <!-- 이미지/영상 교체: <img src="assets/manga.jpg" alt="Homunculus manga"> 또는 <video ...> -->
+          <div class="media__ph" data-art="manga" aria-hidden="true"></div>
+          <figcaption class="mono">추천 이미지 · 만화 표지 / 한 컷 &nbsp;—&nbsp; suggested: manga cover · a panel</figcaption>
+        </figure>
+        <div class="note__body">
+          <span class="note__num mono">03</span>
+          <h3 class="note__h">만화 《호문쿨루스》 <span class="mono">THE MANGA</span></h3>
+          <p>야마모토 히데오(山本英夫)가 2003년부터 2011년까지 《빅코믹 스피리츠》에 연재한 심리 스릴러 만화로, 전 15권으로 완결됐다. 노숙 생활을 하던 전직 회사원 ‘나코시’는 트레퍼네이션을 받은 뒤, 사람들의 마음속 상처가 형상화된 ‘호문쿨루스’를 보게 된다. 인간의 내면과 자아를 파고드는 초현실적 작품으로, 2021년 실사 영화로도 만들어졌다. 이 웹 경험은 그 세계관에서 영감을 받았다.</p>
+          <p class="en">A psychological thriller manga by Hideo Yamamoto, serialized in Big Comic Spirits from 2003 to 2011 and completed in 15 volumes. Susumu Nakoshi, a homeless former salaryman, undergoes trepanation and starts to see “homunculi” — the embodied wounds inside people’s hearts. A surreal study of the inner self, it was also adapted into a live-action film in 2021. This web experience is inspired by its world.</p>
+        </div>
+      </article>
+
+      <footer class="notes__foot mono">
+        <p>원작 · 山本英夫 《ホムンクルス / 호문쿨루스》 (2003–2011, ビッグコミックスピリッツ)</p>
+        <p>이 작업은 비상업적 팬·교육 목적의 헌정입니다. / A non-commercial fan &amp; educational tribute.</p>
+      </footer>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER / CREDITS ===================== -->
+  <footer class="credits mono" data-credits>
+    <span>제3의 눈 · THIRD EYE</span>
+    <span>웹인터랙션디자인 · FINAL PROJECT</span>
+    <span data-year>2026</span>
+  </footer>
+
+  <!-- ===================== SCRIPTS ===================== -->
+  <!-- GSAP from CDN (works online). If it fails (offline & not vendored), the site degrades gracefully. -->
+  <script src="vendor/gsap.min.js" onerror="window.__gsapLocalFailed=true"></script>
+  <script>
+    if (window.__gsapLocalFailed || !window.gsap) {
+      document.write('<scr'+'ipt src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"><\/scr'+'ipt>');
+    }
+  </script>
+  <script src="js/story.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
